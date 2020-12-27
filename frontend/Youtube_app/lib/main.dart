@@ -48,17 +48,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-// class SecondScreen extends StatelessWidget {
-//   final _formkey = GlobalKey<FormState>();
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//         appBar: AppBar(title: Text("Download Videos")),
-//         body: Container(
-//           child: Text("homepage"),
-//         ));
-//   }
-// }
 class SecondScreen extends StatefulWidget {
   @override
   _SecondScreenState createState() => _SecondScreenState();
@@ -66,24 +55,39 @@ class SecondScreen extends StatefulWidget {
 
 class _SecondScreenState extends State<SecondScreen> {
   final _formkey = GlobalKey<FormState>();
+  TextEditingController urlTextController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    // return Scaffold(
-    //     appBar: AppBar(title: Text("Download Videos")),
-    //     body: Container(
-    //       child: Text("homepage"),
-    //     ));
     return Form(
+      key: _formkey,
       child: Scaffold(
-        key: _formkey,
         appBar: AppBar(title: Text("Download Videos")),
         body: Container(
+          padding: const EdgeInsets.all(15),
           child: Column(
             children: <Widget>[
-              Center(
-                child: TextFormField(
-                  decoration: InputDecoration(labelText: 'Enter your username'),
-                ),
+              TextFormField(
+                decoration: InputDecoration(
+                    hintText: 'Paste The Url',
+                    labelText: 'Enter Your Url',
+                    prefixIcon: Icon(Icons.music_video)),
+                controller: urlTextController,
+                validator: (text) {
+                  if (text.isEmpty) {
+                    return 'Paste Url of the video';
+                  }
+                  return null;
+                },
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formkey.currentState.validate()) {
+                    _formkey.currentState.save();
+                  } else {
+                    print('object');
+                  }
+                },
+                child: Text('Submit'),
               )
             ],
           ),
