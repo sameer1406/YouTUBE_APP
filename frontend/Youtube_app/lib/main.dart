@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:splashscreen/splashscreen.dart';
+import 'package:http/http.dart' as http;
+import 'package:Youtube_app/urlModel.dart';
+import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,6 +21,22 @@ class MyApp extends StatelessWidget {
       ),
       home: MyHomePage(title: 'Download Videos from YouTube'),
     );
+  }
+}
+
+Future<UrlModel> passInfo(String url) async {
+  final String apiurl = "http://10.0.2.2:5000/Youtube";
+  Map<String, String> headers = {
+    'Content-type': 'application/json',
+    'Accept': 'application/json'
+  };
+  final response = await http.post(apiurl,
+      headers: headers, body: json.encode({"link": url}));
+  if (response.statusCode == 200) {
+    final String responsestring = response.body;
+    return urlModelFromJson(responsestring);
+  } else {
+    return null;
   }
 }
 
@@ -54,6 +74,7 @@ class SecondScreen extends StatefulWidget {
 }
 
 class _SecondScreenState extends State<SecondScreen> {
+  UrlModel _urlModel;
   final _formkey = GlobalKey<FormState>();
   TextEditingController urlTextController = TextEditingController();
   @override
@@ -80,11 +101,24 @@ class _SecondScreenState extends State<SecondScreen> {
                 },
               ),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formkey.currentState.validate()) {
-                    _formkey.currentState.save();
+                    // _formkey.currentState.save();
+                    final UrlModel = await passInfo(urlTextController.text);
+                    setState(() {
+                      _urlModel = UrlModel;
+                    });
+                    Fluttertoast.showToast(
+                        msg: "${_urlModel.title}",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1);
                   } else {
-                    print('object');
+                    Fluttertoast.showToast(
+                        msg: "Error",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1);
                   }
                 },
                 child: Text('Submit'),
