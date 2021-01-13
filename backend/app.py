@@ -10,12 +10,18 @@ def youtube():
     yt = YouTube(youtube_link)
     views = yt.views
     thumbnail = yt.thumbnail_url
+    title = yt.title
     streams_data = yt.streams
     streams = []
     for stream in streams_data:
         stream_info = stream
         streams.append(stream_info.type)
-    return jsonify({"Data": "successful completed", "info": streams, "views": views,"thumbnail":thumbnail}), 200
+    return jsonify({"Data": "successful completed",
+                    "info": streams,
+                    "views": views,
+                    "thumbnail":thumbnail,
+                    "title" :title
+                    }), 200
 
 
 if __name__ == "__main__":

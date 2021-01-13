@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+List data;
 Future<UrlModel> passInfo(String url) async {
   final String apiurl = "http://10.0.2.2:5000/Youtube";
   Map<String, String> headers = {
@@ -34,6 +35,7 @@ Future<UrlModel> passInfo(String url) async {
       headers: headers, body: json.encode({"link": url}));
   if (response.statusCode == 200) {
     final String responsestring = response.body;
+    // data = json.decode(response.body);
     return urlModelFromJson(responsestring);
   } else {
     return null;
@@ -75,6 +77,9 @@ class SecondScreen extends StatefulWidget {
 
 class _SecondScreenState extends State<SecondScreen> {
   UrlModel _urlModel;
+  String title;
+  int views;
+  var thumbnail;
   final _formkey = GlobalKey<FormState>();
   TextEditingController urlTextController = TextEditingController();
   @override
@@ -107,7 +112,14 @@ class _SecondScreenState extends State<SecondScreen> {
                     final UrlModel = await passInfo(urlTextController.text);
                     setState(() {
                       _urlModel = UrlModel;
+                      views = _urlModel.views;
+                      title = _urlModel.title;
+                      thumbnail = _urlModel.thumbnail;
                     });
+
+                    // Image.network("${_urlModel.thumbnail}");
+                    // Text("Title:" "${_urlModel.title}");
+                    // Text("Views:" "${_urlModel.views}");
                     Fluttertoast.showToast(
                         msg: "${_urlModel.title}",
                         toastLength: Toast.LENGTH_SHORT,
@@ -122,7 +134,18 @@ class _SecondScreenState extends State<SecondScreen> {
                   }
                 },
                 child: Text('Submit'),
-              )
+              ),
+              // _urlModel.title.toString() == null
+              // ? null
+              title != null ? Text("Title:" "${title}") : Container(),
+              views != null ? Text("Views:" "${views}") : Container(),
+              thumbnail != null ? Image.network("${thumbnail}") : Container(),
+              // title != null
+              //     ? ElevatedButton(
+              //         onPressed: null,
+              //         child: Text('Download'),
+              //       )
+              //     : Container()
             ],
           ),
         ),
