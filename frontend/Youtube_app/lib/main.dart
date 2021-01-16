@@ -80,6 +80,7 @@ class _SecondScreenState extends State<SecondScreen> {
   String title;
   int views;
   var thumbnail;
+  bool _loading = false;
   final _formkey = GlobalKey<FormState>();
   TextEditingController urlTextController = TextEditingController();
   @override
@@ -105,21 +106,21 @@ class _SecondScreenState extends State<SecondScreen> {
                   return null;
                 },
               ),
-              ElevatedButton(
+
+              RaisedButton(
                 onPressed: () async {
                   if (_formkey.currentState.validate()) {
-                    // _formkey.currentState.save();
                     final UrlModel = await passInfo(urlTextController.text);
+                    // _loading ? LinearProgressIndicator() : _urlModel;
+
                     setState(() {
+                      _loading = !_loading;
                       _urlModel = UrlModel;
                       views = _urlModel.views;
                       title = _urlModel.title;
                       thumbnail = _urlModel.thumbnail;
                     });
-
-                    // Image.network("${_urlModel.thumbnail}");
-                    // Text("Title:" "${_urlModel.title}");
-                    // Text("Views:" "${_urlModel.views}");
+                    print(title);
                     Fluttertoast.showToast(
                         msg: "${_urlModel.title}",
                         toastLength: Toast.LENGTH_SHORT,
@@ -135,11 +136,16 @@ class _SecondScreenState extends State<SecondScreen> {
                 },
                 child: Text('Submit'),
               ),
-              // _urlModel.title.toString() == null
-              // ? null
-              title != null ? Text("Title:" "${title}") : Container(),
-              views != null ? Text("Views:" "${views}") : Container(),
-              thumbnail != null ? Image.network("${thumbnail}") : Container(),
+
+              title != null
+                  ? Column(children: <Widget>[Text("Title:" "${title}")])
+                  : Container(),
+              views != null
+                  ? Column(children: <Widget>[Text("Views:" "${views}")])
+                  : Container(),
+              thumbnail != null
+                  ? Container(child: Image.network("${thumbnail}"))
+                  : Container(),
               // title != null
               //     ? ElevatedButton(
               //         onPressed: null,
