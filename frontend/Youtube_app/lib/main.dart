@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:Youtube_app/urlModel.dart';
 import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:ext_storage/ext_storage.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   runApp(MyApp());
@@ -24,7 +26,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-List data;
 Future<UrlModel> passInfo(String url) async {
   final String apiurl = "http://10.0.2.2:5000/Youtube";
   Map<String, String> headers = {
@@ -80,6 +81,7 @@ class _SecondScreenState extends State<SecondScreen> {
   String title;
   int views;
   var thumbnail;
+  var dirpath;
   bool _loading = false;
   final _formkey = GlobalKey<FormState>();
   TextEditingController urlTextController = TextEditingController();
@@ -109,18 +111,32 @@ class _SecondScreenState extends State<SecondScreen> {
 
               RaisedButton(
                 onPressed: () async {
-                  if (_formkey.currentState.validate()) {
-                    final UrlModel = await passInfo(urlTextController.text);
-                    // _loading ? LinearProgressIndicator() : _urlModel;
+                  final PermissionHandler _permissionHandler =
+                      PermissionHandler();
+                  var result = await _permissionHandler
+                      .requestPermissions([PermissionGroup.storage]);
 
-                    setState(() {
-                      _loading = !_loading;
-                      _urlModel = UrlModel;
-                      views = _urlModel.views;
-                      title = _urlModel.title;
-                      thumbnail = _urlModel.thumbnail;
-                    });
-                    print(title);
+                  // var dir = await
+                  if (_formkey.currentState.validate()) {
+                    if (result[PermissionGroup.storage] ==
+                        PermissionStatus.granted) {
+                      var dirpath =
+                          await ExtStorage.getExternalStoragePublicDirectory(
+                              ExtStorage.DIRECTORY_DOWNLOADS);
+
+                      final UrlModel = await passInfo(urlTextController.text);
+                      // _loading ? LinearProgressIndicator() : _urlModel;
+
+                      setState(() {
+                        _loading = !_loading;
+                        _urlModel = UrlModel;
+                        views = _urlModel.views;
+                        title = _urlModel.title;
+                        thumbnail = _urlModel.thumbnail;
+                      });
+                      print(dirpath);
+                    }
+                    // print(title);
                     Fluttertoast.showToast(
                         msg: "${_urlModel.title}",
                         toastLength: Toast.LENGTH_SHORT,
